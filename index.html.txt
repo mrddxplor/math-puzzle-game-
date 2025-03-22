@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Puzzle Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+        }
+        .question {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        .options button {
+            padding: 10px 20px;
+            font-size: 18px;
+            margin: 5px;
+            cursor: pointer;
+            width: 100px;
+        }
+        .correct {
+            background-color: green;
+            color: white;
+        }
+        .wrong {
+            background-color: red;
+            color: white;
+        }
+        .correct-answer {
+            color: blue;
+            font-weight: bold;
+        }
+        .highlight {
+            background-color: yellow;
+        }
+        .scoreboard {
+            font-size: 20px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Math Puzzle Game</h1>
+    <div class="scoreboard">Score: <span id="score">0</span> | Lives: <span id="lives">3</span></div>
+    <div class="question" id="question"></div>
+    <div class="options" id="options"></div>
+    <p id="result"></p>
+    <button id="next-btn" onclick="generateQuestion()">Next Question</button>
+    <button onclick="resetGame()">Reset Game</button>
+    
+    <script>
+        let operations = ['+', '-', '*', '/'];
+        let level = 1;
+        let score = 0;
+        let lives = 3;
+        
+        function generateQuestion() {
+            document.getElementById("next-btn").classList.remove("highlight");
+            let num1 = Math.floor(Math.random() * (10 * level)) + 1;
+            let num2 = Math.floor(Math.random() * (10 * level)) + 1;
+            let operation = operations[Math.floor(Math.random() * operations.length)];
+            let correctAnswer;
+
+            if (operation === '+') {
+                correctAnswer = num1 + num2;
+            } else if (operation === '-') {
+                correctAnswer = num1 - num2;
+            } else if (operation === '*') {
+                correctAnswer = num1 * num2;
+            } else {
+                correctAnswer = (num1 / num2).toFixed(2);
+            }
+            
+            let options = [correctAnswer, correctAnswer + 1, correctAnswer - 1, correctAnswer + 2];
+            options.sort(() => Math.random() - 0.5);
+            
+            document.getElementById("question").innerText = `What is ${num1} ${operation} ${num2}?`;
+            document.getElementById("options").innerHTML = "";
+            document.getElementById("result").innerText = "";
+            
+            options.forEach(option => {
+                let button = document.createElement("button");
+                button.innerText = option;
+                button.onclick = function() {
+                    if (parseFloat(option) === parseFloat(correctAnswer)) {
+                        button.classList.add("correct");
+                        document.getElementById("result").innerText = "Correct!";
+                        score += 10;
+                        document.getElementById("score").innerText = score;
+                        document.getElementById("next-btn").classList.add("highlight");
+                    } else {
+                        button.classList.add("wrong");
+                        document.getElementById("result").innerHTML = `Wrong! The correct answer is <span class='correct-answer'>${correctAnswer}</span>`;
+                        lives--;
+                        document.getElementById("lives").innerText = lives;
+                        if (lives === 0) {
+                            alert("Game Over! Resetting...");
+                            resetGame();
+                        }
+                    }
+                };
+                document.getElementById("options").appendChild(button);
+            });
+        }
+        
+        function resetGame() {
+            score = 0;
+            lives = 3;
+            document.getElementById("score").innerText = score;
+            document.getElementById("lives").innerText = lives;
+            generateQuestion();
+        }
+        
+        generateQuestion();
+    </script>
+</body>
+</html>
